@@ -1,4 +1,5 @@
 import random
+from printed import Printed 
 
 class GameLogic:
     def __init__(self):
@@ -73,14 +74,9 @@ class GameLogic:
     def roll_dice(number=6):
         # Generate a sequence of random numbers between 1 and 6 using a generator expression
         return tuple(random.randint(1, 6) for _ in range(number))
-        
-    def string_to_tuple(string):
-      # Convert each character in the string to an tuble of integer using a generator expression
-      tuple_value = tuple(int(digit) for digit in string)
-      return tuple_value
     
     @classmethod
-    def roll(cls,score,digit2,roun):
+    def roll(cls,score,digit2,roun,total):
       """
       Rolls the remaining dice and calculates the score.
 
@@ -93,13 +89,9 @@ class GameLogic:
       Returns:
         int: The total score obtained after rolling the dice.
       """
-      total=score #assign total score for this re-roll round
+      total2=score #assign total score for this re-roll round
       dice=cls.roll_dice(digit2) # roll the remining dices coming fron digit2
-      dices="*** "
-      for i in dice:
-        dices+=str(i)+" "
-      else:
-        dices+="***"
+      dices=Printed.decorate(dice)
       score1=cls.calculate_score(dice) # calculate the defult score for remining dices
       print(f"Rolling {len(dice)} dice...\n{dices}\nEnter dice to keep, or (q)uit:")
       # print to the user enter dices messege and sugisst to quit
@@ -109,29 +101,24 @@ class GameLogic:
       while not userInputs.strip().isdigit(): # to order not to allow the user to enter anything until dices
         print(f"You can't enter any thing untile the dices")
         userInputs=input("> ")
-      iinput=cls.string_to_tuple(userInputs.strip()) # convert string input dices to tuble of integar
+      iinput=Printed.string_to_tuple(userInputs.strip()) # convert string input dices to tuble of integar
+      if  not Printed.validate(dice,iinput):
+             iinput=Printed.cheater(dice,iinput,total)
       score2=cls.calculate_score(iinput) # calculate input score
-      if score2>score1: # check from the score if it more defult score the user are cheating
-         print("Cheater!! oh no")
-         return 0 # return 0 as total becouse the user cheating in this round as first time
       if score1>0: # if the defult score is 0 the user will lose his score in this round
-        total+=score2 # add the score to total score for this round
+        total2+=score2 # add the score to total score for this round
         while userInputs.strip()!="b": # loop untile bank
           digit=digit2 # assign digit for calculate digit for every re-roll time
-          print(f"You have {total} unbanked points and {digit-len(iinput)} dice remaining\n(r)oll again, (b)ank your points or (q)uit:")
+          print(f"You have {total2} unbanked points and {digit-len(iinput)} dice remaining\n(r)oll again, (b)ank your points or (q)uit:")
           digit2=digit-len(iinput) #assign the remining digit of dices
           userInputs=input("> ")
           if userInputs.strip()=="q":
             return 0 # if user need to quit without bank his score the total will be 0
           if userInputs.strip()=="b": # if user need to bunk his score
-            return total # return the total score for this round(total re-roll times)
+            return total2 # return the total score for this round(total re-roll times)
           if userInputs.strip()=="r": # if user need to re-roll remining dices
             dice=cls.roll_dice(digit2) # roll remining dices
-            dices="*** " # made good formate for dices
-            for i in dice:
-              dices+=str(i)+" "
-            else:
-              dices+="***"
+            dices=Printed.decorate(dice)
             score1=cls.calculate_score(dice) # calculate the defult score for remining dices
             if score1==0: # if defult score is 0 the user lose his score in this round 
               return 0 # return 0 as total score in this round
@@ -139,13 +126,12 @@ class GameLogic:
             userInputs=input("> ")
             if userInputs.strip()=="q": # if user needto quit without bank his score
               return 0
-            iinput=cls.string_to_tuple(userInputs.strip()) # convert remining string of dices
+            iinput=Printed.string_to_tuple(userInputs.strip()) # convert remining string of dices
             score2=cls.calculate_score(iinput) # calculate user input score for remining dices
-            if score2<=score1: # check from cheating
-              total+=score2 # the user does not cheating , add win score to the total
-            else: # if the user is cheater
-               print("Cheater!! oh no")
-               return 0 # lose his score
+            if not Printed.validate(dice,iinput,total):
+               Printed.cheater(dice,iinput,total)
+            else:
+               total2+=score2 # the user does not cheating , add win score to the total
       else: # return 0 as score becouse the user lose on it
           return 0
       
@@ -164,26 +150,23 @@ class GameLogic:
       """
       roun=1 #assign roun variable to calculate the round
       dice=cls.roll_dice() # first dice as defult
-      dices="*** " # made good format for dices 
-      for i in dice:
-        dices+=str(i)+" "
-      else:
-        dices+="***"
+      dices=Printed.decorate(dice) # made good format for dices 
       print(f"Starting round {roun}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")# start messege for game
       userInputs=input("> ") # first input my dices or q for quit
       total=0 # assign total variable to calculate the total score
       digit=6 # first digit to play with out reroll dices
       while userInputs.strip()!="q": # if the user input in any part will be q the game will end
-        score1=cls.calculate_score(dice) # defult score to compare it with user input score to avoid cheating
         if not userInputs.strip().isdigit() and userInputs.strip()!="q": # user input should be the dices or q
           print(f"You can't enter any thing untile the dices")
           userInputs=input("> ")
         elif userInputs.strip()=="q": # if user input == q the loop will stop
-          break
+          Printed.quit_game(f"Thanks for playing. You earned {total} points")
         else: # this when user input = dices
-          iinput=cls.string_to_tuple(userInputs.strip()) # convert string dices to tuble  of integer 
-          score2=cls.calculate_score(iinput) # calculate the score of  user inpput
-          if score2<=score1: # check if the user dose not cheating
+          iinput=Printed.string_to_tuple(userInputs.strip()) # convert string dices to tuble  of integer 
+          if not Printed.validate(dice,iinput):
+             iinput=Printed.cheater(dice,iinput,total)
+          else: # check if the user dose not cheating
+            score2=cls.calculate_score(iinput) # calculate the score of  user inpput
             print(f"You have {score2} unbanked points and {6-len(iinput)} dice remaining\n(r)oll again, (b)ank your points or (q)uit:")
             # print to the  user messege to till him about unbank score he is have and the remaining dices and ask him to roll again or bank his score or quit
             digit2=digit-len(iinput) # assign digit2 to calculate the remaining dices
@@ -191,31 +174,21 @@ class GameLogic:
             if userInputs.strip()=="b": # if user choose bank
               total+=score2 # save his score to thetotal score
               dice=cls.roll_dice() # roll defult digit of dices for new round
-              dices="*** "
-              for i in dice:
-                dices+=str(i)+" "
-              else:
-                dices+="***"
+              dices=Printed.decorate(dice)
               print(f"You banked {score2} points in round {roun}\nTotal score is {total} points\nStarting round {roun+1}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")
               # print to the user the score he banked and the round of this score and his total score and start new round whit its number and the dices and suggist to quit
               roun+=1 # rrassign the round number for nrw round
               userInputs=input("> ")
             elif userInputs.strip()=="r": # if user need to re-roll the remaining dices
-              total2=cls.roll(score2,digit2,roun) # cull roll method to re-roll remining  dices and return the total value of score from re-roll time
+              total2=cls.roll(score2,digit2,roun,total) # cull roll method to re-roll remining  dices and return the total value of score from re-roll time
               total+=total2 # add the re-roll score to the total score
               dice=cls.roll_dice() # roll defult dices
-              dices="*** "
-              for i in dice:
-                dices+=str(i)+" "
-              else:
-                dices+="***"
+              dices=Printed.decorate(dice)
               print(f"You banked {total2} points in round {roun}\nTotal score is {total} points\nStarting round {roun+1}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")
               # print bank messege 
               roun+=1 # reassign for new round
               userInputs=input("> ")
-          else: # if user are cheating the game will stop and tell him cheater
-             return "Cheater!! oh no"
-      return f"Thanks for playing. You earned {total} points" # in the end of game this will return
+      Printed.quit_game(f"Thanks for playing. You earned {total} points")  # in the end of game this will return
     @classmethod
     def startGame(cls):
       print("Welcome to Ten Thousand\n(y)es to play or (n)o to decline")
@@ -229,7 +202,7 @@ class GameLogic:
         return cls.play(userInputs)
       else:
         # Return a message if the user declines to play
-        return "OK. Maybe another time"
+        Printed.quit_game("OK. Maybe another time") 
         
 
 if __name__=="__main__":
