@@ -93,11 +93,14 @@ class GameLogic:
       dice=cls.roll_dice(digit2) # roll the remining dices coming fron digit2
       dices=Printed.decorate(dice)
       score1=cls.calculate_score(dice) # calculate the defult score for remining dices
+      if score1==0: # if defult score is 0 the user lose his score in this round 
+        print(Printed.zilch(dice))
+        return 0 # return 0 as total score in this round
       print(f"Rolling {len(dice)} dice...\n{dices}\nEnter dice to keep, or (q)uit:")
       # print to the user enter dices messege and sugisst to quit
       userInputs=input("> ")
       if userInputs.strip()=="q":
-        return 0 # if the user need to quit the method will return 0 as total score for re-roll round
+        Printed.quit_game(f"Thanks for playing. You earned {total} points") # if the user need to quit the method will return 0 as total score for re-roll round
       while not userInputs.strip().isdigit(): # to order not to allow the user to enter anything until dices
         print(f"You can't enter any thing untile the dices")
         userInputs=input("> ")
@@ -109,30 +112,38 @@ class GameLogic:
         total2+=score2 # add the score to total score for this round
         while userInputs.strip()!="b": # loop untile bank
           digit=digit2 # assign digit for calculate digit for every re-roll time
+          if digit==0:
+             return 0
           print(f"You have {total2} unbanked points and {digit-len(iinput)} dice remaining\n(r)oll again, (b)ank your points or (q)uit:")
           digit2=digit-len(iinput) #assign the remining digit of dices
           userInputs=input("> ")
           if userInputs.strip()=="q":
-            return 0 # if user need to quit without bank his score the total will be 0
+            Printed.quit_game(f"Thanks for playing. You earned {total} points") # if user need to quit without bank his score the total will be 0
           if userInputs.strip()=="b": # if user need to bunk his score
             return total2 # return the total score for this round(total re-roll times)
           if userInputs.strip()=="r": # if user need to re-roll remining dices
-            dice=cls.roll_dice(digit2) # roll remining dices
+            if Printed.hotdices(dice,digit):
+              dice=cls.roll_dice(digit)
+              digit2=digit
+            else:
+              dice=cls.roll_dice(digit2) # roll remining dices
             dices=Printed.decorate(dice)
             score1=cls.calculate_score(dice) # calculate the defult score for remining dices
             if score1==0: # if defult score is 0 the user lose his score in this round 
+              print(Printed.zilch(dice))
               return 0 # return 0 as total score in this round
             print(f"Rolling {len(dice)} dice...\n{dices}\nEnter dice to keep, or (q)uit:")
             userInputs=input("> ")
             if userInputs.strip()=="q": # if user needto quit without bank his score
-              return 0
+              Printed.quit_game(f"Thanks for playing. You earned {total} points")
             iinput=Printed.string_to_tuple(userInputs.strip()) # convert remining string of dices
             score2=cls.calculate_score(iinput) # calculate user input score for remining dices
-            if not Printed.validate(dice,iinput,total):
+            if not Printed.validate(dice,iinput):
                Printed.cheater(dice,iinput,total)
             else:
                total2+=score2 # the user does not cheating , add win score to the total
       else: # return 0 as score becouse the user lose on it
+          print(Printed.zilch(dice))
           return 0
       
 
@@ -157,46 +168,45 @@ class GameLogic:
       digit=6 # first digit to play with out reroll dices
       while userInputs.strip()!="q": # if the user input in any part will be q the game will end
         if not userInputs.strip().isdigit() and userInputs.strip()!="q": # user input should be the dices or q
-          print(f"You can't enter any thing untile the dices")
-          userInputs=input("> ")
+          userInputs=Printed.padInput(userInputs,["q","123456"])
         elif userInputs.strip()=="q": # if user input == q the loop will stop
           Printed.quit_game(f"Thanks for playing. You earned {total} points")
         else: # this when user input = dices
           iinput=Printed.string_to_tuple(userInputs.strip()) # convert string dices to tuble  of integer 
-          if not Printed.validate(dice,iinput):
-             iinput=Printed.cheater(dice,iinput,total)
-          else: # check if the user dose not cheating
-            score2=cls.calculate_score(iinput) # calculate the score of  user inpput
-            print(f"You have {score2} unbanked points and {6-len(iinput)} dice remaining\n(r)oll again, (b)ank your points or (q)uit:")
-            # print to the  user messege to till him about unbank score he is have and the remaining dices and ask him to roll again or bank his score or quit
-            digit2=digit-len(iinput) # assign digit2 to calculate the remaining dices
+          if not Printed.validate(dice,iinput): # check if the user dose not cheating
+            iinput=Printed.cheater(dice,iinput,total)
+          score2=cls.calculate_score(iinput) # calculate the score of  user inpput
+          print(f"You have {score2} unbanked points and {6-len(iinput)} dice remaining\n(r)oll again, (b)ank your points or (q)uit:")
+          # print to the  user messege to till him about unbank score he is have and the remaining dices and ask him to roll again or bank his score or quit
+          digit2=digit-len(iinput) # assign digit2 to calculate the remaining dices
+          userInputs=input("> ")
+          if userInputs.strip()=="b": # if user choose bank
+            total+=score2 # save his score to thetotal score
+            dice=cls.roll_dice() # roll defult digit of dices for new round
+            dices=Printed.decorate(dice)
+            print(f"You banked {score2} points in round {roun}\nTotal score is {total} points\nStarting round {roun+1}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")
+            # print to the user the score he banked and the round of this score and his total score and start new round whit its number and the dices and suggist to quit
+            roun+=1 # rrassign the round number for nrw round
             userInputs=input("> ")
-            if userInputs.strip()=="b": # if user choose bank
-              total+=score2 # save his score to thetotal score
-              dice=cls.roll_dice() # roll defult digit of dices for new round
-              dices=Printed.decorate(dice)
-              print(f"You banked {score2} points in round {roun}\nTotal score is {total} points\nStarting round {roun+1}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")
-              # print to the user the score he banked and the round of this score and his total score and start new round whit its number and the dices and suggist to quit
-              roun+=1 # rrassign the round number for nrw round
-              userInputs=input("> ")
-            elif userInputs.strip()=="r": # if user need to re-roll the remaining dices
-              total2=cls.roll(score2,digit2,roun,total) # cull roll method to re-roll remining  dices and return the total value of score from re-roll time
-              total+=total2 # add the re-roll score to the total score
-              dice=cls.roll_dice() # roll defult dices
-              dices=Printed.decorate(dice)
-              print(f"You banked {total2} points in round {roun}\nTotal score is {total} points\nStarting round {roun+1}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")
-              # print bank messege 
-              roun+=1 # reassign for new round
-              userInputs=input("> ")
+          elif userInputs.strip()=="r": # if user need to re-roll the remaining dices
+            if Printed.hotdices(dice,digit):
+               total2=cls.roll(score2,digit,roun,total)
+            else:
+               total2=cls.roll(score2,digit2,roun,total) # cull roll method to re-roll remining  dices and return the total value of score from re-roll time
+            total+=total2 # add the re-roll score to the total score
+            dice=cls.roll_dice() # roll defult dices
+            dices=Printed.decorate(dice)
+            print(f"You banked {total2} points in round {roun}\nTotal score is {total} points\nStarting round {roun+1}\nRolling 6 dice...\n{dices}\nEnter dice to keep, or (q)uit:")
+            # print bank messege 
+            roun+=1 # reassign for new round
+            userInputs=input("> ")
       Printed.quit_game(f"Thanks for playing. You earned {total} points")  # in the end of game this will return
     @classmethod
     def startGame(cls):
       print("Welcome to Ten Thousand\n(y)es to play or (n)o to decline")
       # Prompt the user for input and validate it
       userInputs=input("> ")
-      while userInputs.strip()!="y" and userInputs.strip()!="n": # the user cant enter any think from his mind
-         print("Welcome to Ten Thousand\n(y)es to play or (n)o to decline you can't enter other thing")
-         userInputs=input("> ")
+      userInputs=Printed.padInput(userInputs,["y","n"]) # the user cant enter any think from his mind
       if userInputs.strip()!="n":
         # Start the game if the user chooses to play
         return cls.play(userInputs)

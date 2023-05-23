@@ -3,8 +3,6 @@
 **Author:** 
 ```
 Aseel Bdoor 
-Qais Dwairi
-Moath Shakatreh
 ```
 **Setup:**.env requirements `pip install pytest`
 

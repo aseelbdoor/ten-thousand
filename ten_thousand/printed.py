@@ -32,6 +32,14 @@ class Printed:
                 return False
         return True
     
+    def padInput(user,per):
+        while user.strip() not in per:
+            if user.strip().isdigit():
+                return user
+            print(f"You can't enter any thing untile {per}")
+            user=input("> ")
+        return user
+    
     @classmethod
     def cheater(cls,dice,user,total):
         dices=cls.decorate(dice)
@@ -44,13 +52,44 @@ class Printed:
                 user=cls.string_to_tuple(user)
         return user
     
-    def hotdices():
-        pass
-
-    def zilch():
-        pass
+    def hotdices(dice,digit):
+        if len(dice)==digit:
+            dice=sorted(dice)
+            if digit==6:
+                for i in range(0,6,2):
+                    if dice.count(dice[i])==2:
+                        continue
+                    else:
+                        break
+                else:
+                    return True
+                for i in range(0,5):
+                    if dice[i+1]==dice[i]+1:
+                        continue
+                    else:
+                        break
+                else:
+                    return True
+            for i in range(len(dice)):
+                if dice[i]==1 or dice[i]==5:
+                    continue
+                else:
+                    if dice.count(dice[i])>2:
+                        continue
+                    else:
+                        return False
+            return True     
+        else:
+            return False
+    
+    @classmethod
+    def zilch(cls,dice):
+        dices=cls.decorate(dice)
+        return f"{dices}\n****************************************\n**        Zilch!!! Round over         **\n****************************************"
     
 if __name__=="__main__":
-    a=(1,2,2,3,4)
-    b=(1,2,2,5)
-    print(Printed.cheater(a,b,5))
+    # a=(1,2,2,3,4)
+    # b=(1,2,2,5)
+    # print(Printed.cheater(a,b,5))
+    # print(Printed.padInput(("55"),["q","123456"]))
+    print(Printed.hotdices((1,2,5,3,7,6),6))
