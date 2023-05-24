@@ -146,9 +146,8 @@ class GameLogic:
           print(Printed.zilch(dice))
           return 0
       
-
     @classmethod
-    def play(cls,userInputs):
+    def startGame(cls,userInputs):
       """
       Plays the game of Ten Thousand.
 
@@ -201,19 +200,17 @@ class GameLogic:
             roun+=1 # reassign for new round
             userInputs=input("> ")
       Printed.quit_game(f"Thanks for playing. You earned {total} points")  # in the end of game this will return
+    
     @classmethod
-    def startGame(cls):
-      print("Welcome to Ten Thousand\n(y)es to play or (n)o to decline")
-      # Prompt the user for input and validate it
-      userInputs=input("> ")
-      userInputs=Printed.padInput(userInputs,["y","n"]) # the user cant enter any think from his mind
-      if userInputs.strip()!="n":
-        # Start the game if the user chooses to play
-        return cls.play(userInputs)
-      else:
-        # Return a message if the user declines to play
-        Printed.quit_game("OK. Maybe another time") 
-        
-
-if __name__=="__main__":
-  print(GameLogic.startGame())
+    def get_scorers(cls ,dice):
+      total=cls.calculate_score(dice)
+      if total==0:
+        return tuple()
+      scorers=[]
+      for i,val in enumerate(dice):
+        sub_roll=dice[:i]+dice[i+1:]
+        sub_score=cls.calculate_score(sub_roll)
+        if sub_score != total:
+           scorers.append(val)
+      return tuple(scorers)
+       

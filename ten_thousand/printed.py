@@ -87,9 +87,3 @@ class Printed:
         dices=cls.decorate(dice)
         return f"{dices}\n****************************************\n**        Zilch!!! Round over         **\n****************************************"
     
-if __name__=="__main__":
-    # a=(1,2,2,3,4)
-    # b=(1,2,2,5)
-    # print(Printed.cheater(a,b,5))
-    # print(Printed.padInput(("55"),["q","123456"]))
-    print(Printed.hotdices((1,2,5,3,7,6),6))
