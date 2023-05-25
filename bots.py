@@ -5,14 +5,9 @@ at same level as pyproject.toml
 from abc import ABC, abstractmethod
 import builtins
 import re
-from ten_thousand.game import Game
 from ten_thousand.game_logic import GameLogic
 from ten_thousand.printed import Printed
-
-
-# import ten_thousand.game as Game
-# import ten_thousand.game_logic as GameLogic
-# import ten_thousand.printed as Printed
+from ten_thousand.game import Game
 
 
 class BaseBot(ABC):
@@ -24,7 +19,7 @@ class BaseBot(ABC):
         self.print_all = print_all
         self.dice_remaining = 0
         self.unbanked_points = 0
-
+        self.hot=False
         self.real_print = print
         self.real_input = input
         builtins.print = self._mock_print
@@ -93,7 +88,6 @@ class BaseBot(ABC):
         Defaults to all scoring dice"""
 
         roll = GameLogic.get_scorers(self.last_roll)
-
         roll_string = ""
 
         for value in roll:
@@ -142,10 +136,17 @@ class NervousNellie(BaseBot):
         return "b"
 
 
-class YourBot(BaseBot):
+class Aseel(BaseBot):
     def _roll_bank_or_quit(self):
         """your logic here"""
-        return "b"
+        if self.unbanked_points>200:
+            return "b"
+        elif self.dice_remaining<=2:
+            return "b"
+        elif self.dice_remaining==0:
+            return "r"
+        else:
+            return "r"
 
     def _enter_dice(self):
         """simulate user entering which dice to keep.
@@ -157,4 +158,4 @@ class YourBot(BaseBot):
 if __name__ == "__main__":
     num_games = 100
     NervousNellie.play(num_games)
-    # YourBot.play(num_games)
+    Aseel.play(num_games)

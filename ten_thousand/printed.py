@@ -20,6 +20,10 @@ class Printed:
 
     def quit_game(message):
         exit(message)
+
+    def end_game(total):
+        print(f"Thanks for playing. You earned {total} points")
+        exit()
     
     def validate(dice,user):
         for i in user:
