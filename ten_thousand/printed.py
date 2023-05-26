@@ -20,6 +20,10 @@ class Printed:
 
     def quit_game(message):
         exit(message)
+
+    def end_game(total):
+        print(f"Thanks for playing. You earned {total} points")
+        exit()
     
     def validate(dice,user):
         for i in user:
@@ -87,9 +91,3 @@ class Printed:
         dices=cls.decorate(dice)
         return f"{dices}\n****************************************\n**        Zilch!!! Round over         **\n****************************************"
     
-if __name__=="__main__":
-    # a=(1,2,2,3,4)
-    # b=(1,2,2,5)
-    # print(Printed.cheater(a,b,5))
-    # print(Printed.padInput(("55"),["q","123456"]))
-    print(Printed.hotdices((1,2,5,3,7,6),6))
